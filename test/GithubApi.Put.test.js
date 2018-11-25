@@ -12,24 +12,20 @@ describe('Follow github user', () => {
     followUser = agent.put(`${urlBase}/user/following/${githubUserName}`)
       .auth('token', process.env.ACCESS_TOKEN);
   });
-  it('Verify', () => {
-    followUser.then((response) => {
-      expect(response.status).to.equal(statusCode.NO_CONTENT);
-      expect(response.body).to.eql({});
-    });
-  });
+  it('Verify', () => followUser.then((response) => {
+    expect(response.status).to.equal(statusCode.NO_CONTENT);
+    expect(response.body).to.eql({});
+  }));
   describe('Comprove following list', () => {
+    let userFollowingQuery;
     before(() => {
-      const userFollowingQuery = agent.get(`${urlBase}/user/following`)
-        .auth('token', process.env.ACCESS_TOKEN)
-        .then((response) => {
-          userFollowing = response.body.find(user => user.login === githubUserName);
-        });
-      return userFollowingQuery;
+      userFollowingQuery = agent.get(`${urlBase}/user/following`)
+        .auth('token', process.env.ACCESS_TOKEN);
     });
-    it('Verify', () => {
-      expect(userFollowing.login).to.equal(githubUserName);
-    });
+    it('Verify', () => userFollowingQuery.then((response) => {
+      userFollowing = response.body.find(users => users.login === githubUserName);
+      expect(userFollowing.login).to.be.equal(githubUserName);
+    }));
     describe('Follow again to verify idempotent', () => {
       let userFollowingAgain;
       let followUserAgain;
@@ -37,24 +33,19 @@ describe('Follow github user', () => {
         followUserAgain = agent.put(`${urlBase}/user/following/${githubUserName}`)
           .auth('token', process.env.ACCESS_TOKEN);
       });
-      it('Verify', () => {
-        followUserAgain.then((response) => {
-          expect(response.status).to.equal(statusCode.NO_CONTENT);
-          expect(response.body).to.eql({});
-        });
-      });
+      it('Verify', () => followUserAgain.then((response) => {
+        expect(response.status).to.equal(statusCode.NO_CONTENT);
+        expect(response.body).to.eql({});
+      }));
       describe('Comprove following list', () => {
         before(() => {
-          const userFollowingQuery = agent.get(`${urlBase}/user/following`)
-            .auth('token', process.env.ACCESS_TOKEN)
-            .then((response) => {
-              userFollowingAgain = response.body.find(user => user.login === githubUserName);
-            });
-          return userFollowingQuery;
+          userFollowingAgain = agent.get(`${urlBase}/user/following`)
+            .auth('token', process.env.ACCESS_TOKEN);
         });
-        it('Verify', () => {
-          expect(userFollowingAgain.login).to.equal(githubUserName);
-        });
+        it('Verify', () => userFollowingAgain.then((response) => {
+          userFollowingAgain = response.body.find(user => user.login === githubUserName);
+          expect(userFollowingAgain.login).to.be.equal(githubUserName);
+        }));
       });
     });
   });
