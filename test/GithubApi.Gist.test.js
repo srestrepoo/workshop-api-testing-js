@@ -26,8 +26,8 @@ describe('Create and delete gist', () => {
     createGistQuery = agent.post(`${urlBase}/gists`, createGist)
       .auth('token', process.env.ACCESS_TOKEN);
   });
-  it('Verify created gist', () => createGistQuery.then(async (response) => {
-    gist = await response.body;
+  it('Verify created gist', () => createGistQuery.then((response) => {
+    gist = response.body;
     expect(response.status).to.be.equal(statusCode.CREATED);
     expect(gist.public).to.be.equal(true);
     expect(gist.description).to.be.equal('example promise');
