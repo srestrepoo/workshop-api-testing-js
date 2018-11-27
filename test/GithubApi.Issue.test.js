@@ -45,7 +45,7 @@ describe('user logged', () => {
         expect(issue.body).to.be.equal(null);
       });
       describe('Edit the body of the issue', () => {
-        const updateBodyIssue = { body: 'body updated' };
+        const updateBodyIssue = { body: 'body updated', state: 'closed' };
         let updatedIssue;
         before(() => {
           const issueUpdate = agent.patch(`${urlBase}/repos/${user.login}/${repository.name}/issues/${issue.number}`, updateBodyIssue)
@@ -55,9 +55,10 @@ describe('user logged', () => {
             });
           return issueUpdate;
         });
-        it('Comprove new body', () => {
+        it('Comprove new body and close the issue', () => {
           expect(updatedIssue.title).to.be.equal(title.title);
           expect(updatedIssue.body).to.be.equal(updateBodyIssue.body);
+          expect(updatedIssue.state).to.be.equal(updateBodyIssue.state);
         });
       });
     });
